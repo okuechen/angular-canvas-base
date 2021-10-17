@@ -12,13 +12,13 @@ Here some examples how to handle the canvas base.
 
 ```typescript
 import { Component, Injector } from '@angular/core';
-import { CanvasBaseComponent, ICanvas, Point } from 'angular-canvas-base';
+import { CanvasBaseDirective, ICanvas, Point } from 'angular-canvas-base';
 
 @Component({
     selector: 'my-canvas-component',
     template: ''
 })
-export class MyCanvasComponent extends CanvasBaseComponent {
+export class MyCanvasComponent extends CanvasBaseDirective {
     constructor(injector: Injector) {
         super(injector);
 
@@ -36,13 +36,13 @@ export class MyCanvasComponent extends CanvasBaseComponent {
 
 ```typescript
 import { Component, Injector } from '@angular/core';
-import { CanvasBaseComponent, CanvasFont, FillStyle, ICanvas, StrokeStyle } from 'angular-canvas-base';
+import { CanvasBaseDirective, CanvasFont, FillStyle, ICanvas, StrokeStyle } from 'angular-canvas-base';
 
 @Component({
     selector: 'my-canvas-component',
     template: ''
 })
-export class MyCanvasComponent extends CanvasBaseComponent {
+export class MyCanvasComponent extends CanvasBaseDirective {
     constructor(injector: Injector) {
         super(injector);
 
@@ -69,13 +69,13 @@ export class MyCanvasComponent extends CanvasBaseComponent {
 
 ```typescript
 import { Component, Injector } from '@angular/core';
-import { CanvasBaseComponent, CanvasDrawMode, FillStyle, ICanvas, StrokeStyle } from 'angular-canvas-base';
+import { CanvasBaseDirective, CanvasDrawMode, FillStyle, ICanvas, StrokeStyle } from 'angular-canvas-base';
 
 @Component({
     selector: 'my-canvas-component',
     template: ''
 })
-export class MyCanvasComponent extends CanvasBaseComponent {
+export class MyCanvasComponent extends CanvasBaseDirective {
     private size = 10;
     private direction = 0.2;
 
