@@ -1,24 +1,108 @@
-# AngularCanvasBase
+# angular-canvas-base
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.13.
+The react canvas base was created to simplify creating canvas components for angular. You can add it to your project via NPM.
 
-## Code scaffolding
+`npm install angular-canvas-base`
 
-Run `ng generate component component-name --project angular-canvas-base` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project angular-canvas-base`.
-> Note: Don't forget to add `--project angular-canvas-base` or else it will be added to the default project in your `angular.json` file. 
+## Examples
 
-## Build
+Here some examples how to handle the canvas base.
 
-Run `ng build angular-canvas-base` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Create a component that draws a rectangle
 
-## Publishing
+```typescript
+import { Component, Injector } from '@angular/core';
+import { CanvasBaseComponent, ICanvas, Point } from 'angular-canvas-base';
 
-After building your library with `ng build angular-canvas-base`, go to the dist folder `cd dist/angular-canvas-base` and run `npm publish`.
+@Component({
+    selector: 'my-canvas-component',
+    template: ''
+})
+export class MyCanvasComponent extends CanvasBaseComponent {
+    constructor(injector: Injector) {
+        super(injector);
 
-## Running unit tests
+        this.resize(200, 200);
+    }
 
-Run `ng test angular-canvas-base` to execute the unit tests via [Karma](https://karma-runner.github.io).
+    protected onDraw(canvas: ICanvas) {
+        canvas.drawRect(10, 10, 180, 180, false, true);
+    }
+}
 
-## Further help
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+### Draw a centered label inside a rectangle
+
+```typescript
+import { Component, Injector } from '@angular/core';
+import { CanvasBaseComponent, CanvasFont, FillStyle, ICanvas, StrokeStyle } from 'angular-canvas-base';
+
+@Component({
+    selector: 'my-canvas-component',
+    template: ''
+})
+export class MyCanvasComponent extends CanvasBaseComponent {
+    constructor(injector: Injector) {
+        super(injector);
+
+        this.resize(200, 200);
+    }
+
+    protected onDraw(canvas: ICanvas) {
+        canvas.setFillStyle(new FillStyle('#F00'));
+        canvas.setStrokeStyle(new StrokeStyle('#888', 4));
+
+        canvas.drawRect(10, 10, 180, 180, true, true);
+
+        canvas.setFont(new CanvasFont(24, 'Arial'));
+        canvas.setFillStyle(new FillStyle('#FFF'));
+        canvas.setTextBaseline('middle');
+
+        canvas.drawText('Button', 60, 96, 90, true);
+    }
+}
+
+```
+
+### Draw a simple animation with frame-time and continuous drawing
+
+```typescript
+import { Component, Injector } from '@angular/core';
+import { CanvasBaseComponent, CanvasDrawMode, FillStyle, ICanvas, StrokeStyle } from 'angular-canvas-base';
+
+@Component({
+    selector: 'my-canvas-component',
+    template: ''
+})
+export class MyCanvasComponent extends CanvasBaseComponent {
+    private size = 10;
+    private direction = 0.2;
+
+    constructor(injector: Injector) {
+        super(injector);
+
+        this.setDrawMode(CanvasDrawMode.Continuous);
+        this.resize(500, 500);
+    }
+
+    protected onDraw(canvas: ICanvas, frameTime: number) {
+        canvas.clear();
+        canvas.setFillStyle(new FillStyle('#BBB'));
+        canvas.setStrokeStyle(new StrokeStyle('#444', 2));
+
+        canvas.drawRect(200 - this.size / 2, 200 - this.size / 2, this.size, this.size, true, true);
+
+        this.size += this.direction * frameTime;
+
+        if (this.size < 10) {
+            this.direction = 0.2;
+        }
+
+        if (this.size > 200) {
+            this.direction = -0.2;
+        }
+    }
+}
+
+```

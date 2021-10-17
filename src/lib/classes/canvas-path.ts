@@ -11,7 +11,7 @@ export class CanvasPath implements ICanvasPath {
         return this.pathOpen;
     }
 
-    public begin() {
+    public begin(): void {
         if (this.pathOpen) {
             return;
         }
@@ -40,7 +40,7 @@ export class CanvasPath implements ICanvasPath {
         return this;
     }
 
-    public close(fill: boolean, stroke: boolean) {
+    public close(fill: boolean, stroke: boolean): void {
         this.context.closePath();
         this.pathOpen = false;
 

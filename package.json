@@ -1,11 +1,30 @@
 {
   "name": "angular-canvas-base",
-  "version": "0.0.1",
+  "author": "Oliver Küchen",
+  "license": "MIT",
+  "bugs": {
+      "url": "https://github.com/okuechen/angular-canvas-base/issues"
+  },
+  "homepage": "https://github.com/okuechen/angular-canvas-base",
+  "version": "0.1.0",
+  "private": false,
+  "typings": "./dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "keywords": [
+      "angular",
+      "canvas",
+      "custom component"
+  ],
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/okuechen/angular-canvas-base.git"
+  },
   "peerDependencies": {
-    "@angular/common": "^9.1.13",
-    "@angular/core": "^9.1.13"
+    "@angular/common": "~11.0.9",
+    "@angular/core": "~11.0.9"
   },
   "dependencies": {
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   }
 }

@@ -4,7 +4,11 @@ export interface IColorStep {
 }
 
 export class FillStyle {
-    public value: string | CanvasGradient | CanvasPattern;
+    public value: string | CanvasGradient | CanvasPattern | undefined;
+
+    constructor(value?: string | CanvasGradient | CanvasPattern) {
+        this.value = value;
+    }
 
     public isValid(): boolean {
         return this.value != null && this.value !== 'none';

@@ -1,17 +1,14 @@
-import { OnDestroy, Renderer2, AfterViewInit, Component, ViewChild, ElementRef, Injector } from '@angular/core';
+import { OnDestroy, Renderer2, AfterViewInit, ElementRef, Injector, Directive } from '@angular/core';
 
 import { CanvasDrawMode } from './enums/canvas-draw-mode.enum';
 import { Canvas } from './classes/canvas';
 import { ICanvas } from './interfaces/canvas.interface';
 import { Point } from './classes/point';
 
-@Component({
-    selector: 'canvas-base',
-    template: ''
-})
-export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
-    protected height: number;
-    protected width: number;
+@Directive()
+export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
+    protected height = 0;
+    protected width = 0;
     protected drawMode: CanvasDrawMode = CanvasDrawMode.OnDemand;
     protected clearOnDraw = true;
 
@@ -20,14 +17,14 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
     private dragStartPosition: Point = new Point();
     private dragMaxDistance = 15;
     private dragStartTimeout = 300;
-    private dragStartTimeoutHandle: number = null;
+    private dragStartTimeoutHandle: number | null = null;
 
     private inDrawingLoop = false;
-    private currentFrameRequestID: number = null;
-    private lastTime: number = null;
+    private currentFrameRequestID: number | null = null;
+    private lastTime = 0;
     private disposed = false;
 
-    private canvas: Canvas = null;
+    private canvas: Canvas;
     protected elementRef: ElementRef;
     protected renderer: Renderer2;
 
@@ -39,7 +36,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         this.canvas.resizeCanvas(0, 0);
     }
 
-    public ngAfterViewInit() {
+    public ngAfterViewInit(): void {
         this.attachCanvas(this.elementRef.nativeElement);
 
         this.renderer.listen(this.getCanvasNode(), 'click', (event) => {
@@ -47,11 +44,11 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         });
     }
 
-    public ngOnDestroy() {
+    public ngOnDestroy(): void {
         this.disposed = true;
     }
 
-    private attachCanvas(parent: HTMLElement) {
+    private attachCanvas(parent: HTMLElement): void {
         parent.appendChild(this.canvas.getDomNode());
     }
 
@@ -59,7 +56,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         return this.canvas.toBase64();
     }
 
-    public toBlob(type: string = 'image/png', quality: number = 99): Promise<Blob> {
+    public toBlob(type: string = 'image/png', quality: number = 99): Promise<Blob | null> {
         return this.canvas.toBlob(type, quality);
     }
 
@@ -67,7 +64,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         return this.canvas;
     }
 
-    public resize(width: number, height: number) {
+    public resize(width: number, height: number): void {
         this.width = width;
         this.height = height;
 
@@ -81,18 +78,16 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         return this.canvas.getDomNode();
     }
 
-    protected startDrawing() {
+    protected startDrawing(): void {
         if (this.clearOnDraw) {
             this.canvas.clear();
         }
-
-        this.onFrameUpdate(this.getTimeDelta());
 
         // sharpness fix
         this.canvas.saveState();
         this.canvas.translate(0.5, 0.5);
 
-        this.onDraw(this.canvas);
+        this.onDraw(this.canvas, this.getTimeDelta());
 
         this.canvas.restoreState();
     }
@@ -103,7 +98,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         return buffer;
     }
 
-    public draw() {
+    public draw(): void {
         if (this.inDrawingLoop || this.currentFrameRequestID != null) {
             return;
         } else {
@@ -111,7 +106,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-    public setDrawMode(drawMode: CanvasDrawMode) {
+    public setDrawMode(drawMode: CanvasDrawMode): void {
         this.drawMode = drawMode;
         this.draw();
     }
@@ -120,7 +115,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         return this.dragAndDropEnabled;
     }
 
-    public enableDragAndDrop(enable: boolean) {
+    public enableDragAndDrop(enable: boolean): void {
         this.dragAndDropEnabled = enable;
 
         if (enable) {
@@ -138,14 +133,14 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-    protected abstract onDraw(canvas: ICanvas);
-    protected abstract onFrameUpdate(deltaTime: number);
+    protected abstract onDraw(canvas: ICanvas, deltaTime?: number): void;
 
-    protected abstract eventResize(width: number, height: number);
-    protected abstract eventClick(event: PointerEvent);
-    protected abstract eventDrag(event: PointerEvent): boolean;
-    protected abstract eventDragMove(event: PointerEvent);
-    protected abstract eventDrop(event: PointerEvent, startPosition: Point);
+    // Overridables
+    protected eventResize(width: number, height: number): void {}
+    protected eventClick(event: PointerEvent): void {}
+    protected eventDrag(event: PointerEvent): boolean { return false; }
+    protected eventDragMove(event: PointerEvent): void {}
+    protected eventDrop(event: PointerEvent, startPosition: Point): void {}
 
     protected getTime(): number {
         return window.performance.now();
@@ -165,7 +160,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         return Math.hypot(x2 - x1, y2 - y1);
     }
 
-    private requestDraw() {
+    private requestDraw(): void {
         this.currentFrameRequestID = requestAnimationFrame(() => {
             this.currentFrameRequestID = null;
             this.startDrawing();
@@ -181,7 +176,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         });
     }
 
-    private mouseUp(event: PointerEvent) {
+    private mouseUp(event: PointerEvent): void {
         if (this.dragStartTimeoutHandle) {
             window.clearTimeout(this.dragStartTimeoutHandle);
             this.dragStartTimeoutHandle = null;
@@ -194,7 +189,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-    private mouseMove(event: PointerEvent) {
+    private mouseMove(event: PointerEvent): void {
         if (this.dragStartTimeoutHandle) {
             if (this.getDistance(this.dragStartPosition.x, this.dragStartPosition.y, event.offsetX, event.offsetY) > this.dragMaxDistance) {
                 window.clearTimeout(this.dragStartTimeoutHandle);
@@ -208,7 +203,7 @@ export abstract class CanvasBaseComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-    private mouseDown(event: PointerEvent) {
+    private mouseDown(event: PointerEvent): void {
         this.dragStartPosition.setPoint(event.offsetX, event.offsetY);
         this.dragStartTimeoutHandle = window.setTimeout(() => {
             this.dragStartTimeoutHandle = null;

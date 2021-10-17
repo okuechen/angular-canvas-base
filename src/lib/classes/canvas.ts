@@ -9,9 +9,10 @@ import { CanvasFont } from './canvas-font';
 
 export class Canvas implements ICanvas {
     protected pixelRatio = 1;
-    protected context: CanvasRenderingContext2D = null;
-    private canvasNode: HTMLCanvasElement  = null;
-    private canvasPath: CanvasPath = null;
+    protected context: CanvasRenderingContext2D;
+
+    private canvasNode: HTMLCanvasElement;
+    private canvasPath: CanvasPath;
     private width = 0;
     private height = 0;
 
@@ -19,8 +20,7 @@ export class Canvas implements ICanvas {
         this.pixelRatio = window.devicePixelRatio || 1;
 
         this.canvasNode = document.createElement('canvas');
-        this.context = this.canvasNode.getContext('2d');
-
+        this.context = this.canvasNode.getContext('2d') as CanvasRenderingContext2D;
         this.canvasPath = new CanvasPath(this.context, this.pixelRatio);
     }
 
@@ -28,9 +28,9 @@ export class Canvas implements ICanvas {
         return this.canvasNode.toDataURL();
     }
 
-    public toBlob(type: string = 'image/png', quality: number = 1): Promise<Blob> {
-        const promise = new Promise<Blob>((resolve, reject) => {
-            this.canvasNode.toBlob((blob: Blob) => {
+    public toBlob(type: string, quality: number): Promise<Blob | null> {
+        const promise = new Promise<Blob | null>((resolve, reject) => {
+            this.canvasNode.toBlob((blob) => {
                 resolve(blob);
             }, type, quality);
         });
@@ -38,7 +38,7 @@ export class Canvas implements ICanvas {
         return promise;
     }
 
-    public resizeCanvas(width: number, height: number) {
+    public resizeCanvas(width: number, height: number): void {
         this.width = width;
         this.height = height;
         this.canvasNode.width = width * this.pixelRatio;
@@ -57,56 +57,60 @@ export class Canvas implements ICanvas {
         return this.height;
     }
 
-    public translate(x: number, y: number) {
+    public translate(x: number, y: number): void {
         this.context.translate(x * this.pixelRatio, y * this.pixelRatio);
     }
 
-    public scale(x: number, y: number) {
+    public scale(x: number, y: number): void {
         this.context.scale(x, y);
     }
 
-    public rotate(angle: number) {
+    public rotate(angle: number): void {
         this.context.rotate(angle);
     }
 
-    public saveState() {
+    public saveState(): void {
         this.context.save();
     }
 
-    public restoreState() {
+    public restoreState(): void {
         this.context.restore();
     }
 
-    public clear() {
+    public clear(): void {
         this.context.clearRect(0, 0, this.width * this.pixelRatio, this.height * this.pixelRatio);
     }
 
-    public clearRect(x: number, y: number, width: number, height: number) {
+    public clearRect(x: number, y: number, width: number, height: number): void {
         this.context.clearRect(x * this.pixelRatio, y * this.pixelRatio, width * this.pixelRatio, height * this.pixelRatio);
     }
 
-    public setFilter(filter: CanvasFilter) {
-        this.context['filter'] = filter.getFilter();
+    public setFilter(filter: CanvasFilter): void {
+        this.context.filter = filter.getFilter();
     }
 
-    public removeFilter() {
-        this.context['filter'] = 'none';
+    public removeFilter(): void {
+        this.context.filter = 'none';
     }
 
-    public setLineDash(linePx: number, spacePx: number) {
+    public setLineDash(linePx: number, spacePx: number): void {
         this.context.setLineDash([linePx * this.pixelRatio, spacePx * this.pixelRatio]);
     }
 
-    public setFillStyle(style: FillStyle) {
-        this.context.fillStyle = style.value;
+    public setFillStyle(style: FillStyle): void {
+        if (style.value) {
+            this.context.fillStyle = style.value;
+        }
     }
 
-    public setStrokeStyle(style: StrokeStyle) {
-        this.context.strokeStyle = style.color;
-        this.context.lineWidth = style.lineWidth * this.pixelRatio;
+    public setStrokeStyle(style: StrokeStyle): void {
+        if (style.color) {
+            this.context.strokeStyle = style.color;
+        }
+        this.context.lineWidth = (style.lineWidth ?? 1) * this.pixelRatio;
     }
 
-    public setShadowStyle(style: ShadowStyle) {
+    public setShadowStyle(style: ShadowStyle): void {
         if (style) {
             this.context.shadowColor = style.color;
             this.context.shadowBlur = style.blur;
@@ -120,26 +124,26 @@ export class Canvas implements ICanvas {
         }
     }
 
-    public setFont(font: CanvasFont) {
+    public setFont(font: CanvasFont): void {
         this.context.font = `${font.fontStyle} ${font.fontWeight} ${font.fontSize * this.pixelRatio}px ${font.fontFamily}`;
     }
 
-    public setTextBaseline(alignment: 'alphabetic' | 'top' | 'hanging' | 'middle' | 'ideographic' | 'bottom') {
+    public setTextBaseline(alignment: 'alphabetic' | 'top' | 'hanging' | 'middle' | 'ideographic' | 'bottom'): void {
         this.context.textBaseline = alignment;
     }
 
-    public setOpacity(value: number) {
+    public setOpacity(value: number): void {
         this.context.globalAlpha = value;
     }
 
-    public setClipRegion(x: number, y: number, width: number, height: number) {
+    public setClipRegion(x: number, y: number, width: number, height: number): void {
         this.context.beginPath();
         this.context.rect(x * this.pixelRatio, y * this.pixelRatio, width * this.pixelRatio, height * this.pixelRatio);
         this.context.closePath();
         this.context.clip();
     }
 
-    public drawRect(x: number, y: number, width: number, height: number, fill?: boolean, stroke?: boolean) {
+    public drawRect(x: number, y: number, width: number, height: number, fill?: boolean, stroke?: boolean): void {
         if (fill === true) {
             this.context.fillRect(x * this.pixelRatio, y * this.pixelRatio, width * this.pixelRatio, height * this.pixelRatio);
         }
@@ -149,16 +153,17 @@ export class Canvas implements ICanvas {
         }
     }
 
-    public drawArc(x: number, y: number, radius: number, startAngle: number, endAngle: number) {
+    public drawArc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void {
         this.context.arc(x * this.pixelRatio, y * this.pixelRatio, radius, startAngle, endAngle);
     }
 
-    public drawEllipse(x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number) {
+    public drawEllipse(x: number, y: number, radiusX: number, radiusY: number,
+                       rotation: number, startAngle: number, endAngle: number): void {
         this.context.ellipse(x * this.pixelRatio, y * this.pixelRatio, radiusX, radiusY, rotation, startAngle, endAngle);
     }
 
     public drawRoundRect(x: number, y: number, width: number, height: number,
-                         radius: number | ICorners, fill: boolean, stroke: boolean) {
+                         radius: number | ICorners, fill: boolean, stroke: boolean): void {
 
         let borderRadius: ICorners;
         if (typeof(radius) === 'number') {
@@ -185,7 +190,7 @@ export class Canvas implements ICanvas {
             .close(fill, stroke);
     }
 
-    public drawLine(x: number, y: number, x2: number, y2: number) {
+    public drawLine(x: number, y: number, x2: number, y2: number): void {
         this.context.beginPath();
         this.context.moveTo(x * this.pixelRatio, y * this.pixelRatio);
         this.context.lineTo(x2 * this.pixelRatio, y2 * this.pixelRatio);
@@ -193,7 +198,7 @@ export class Canvas implements ICanvas {
         this.context.stroke();
     }
 
-    public drawText(text: string, x: number, y: number, maxWidth?: number, fill?: boolean, stroke?: boolean) {
+    public drawText(text: string, x: number, y: number, maxWidth?: number, fill?: boolean, stroke?: boolean): void {
         if (fill !== false) {
             if (maxWidth == null) {
                 this.context.fillText(text, x * this.pixelRatio, y * this.pixelRatio);
@@ -213,7 +218,8 @@ export class Canvas implements ICanvas {
         }
     }
 
-    public drawWrappedText(text: string, x: number, y: number, maxWidth: number, lineHeight: number, fill?: boolean, stroke?: boolean) {
+    public drawWrappedText(text: string, x: number, y: number, maxWidth: number,
+                           lineHeight: number, fill?: boolean, stroke?: boolean): void {
         const words = text.split(' ');
         let line = '';
 
@@ -223,7 +229,7 @@ export class Canvas implements ICanvas {
             const testWidth = metrics.width;
 
             if (testWidth > x + maxWidth && n > 0) {
-                this.drawText(line, x, y, null, fill, stroke);
+                this.drawText(line, x, y, undefined, fill, stroke);
                 line = words[n] + ' ';
                 y += lineHeight;
             } else {
@@ -231,29 +237,30 @@ export class Canvas implements ICanvas {
             }
         }
 
-        this.drawText(line, x, y, null, fill, stroke);
+        this.drawText(line, x, y, undefined, fill, stroke);
     }
 
     public drawImage(image: HTMLImageElement | HTMLCanvasElement | ImageBitmap | ICanvas,
-                     x: number, y: number, width?: number, height?: number) {
+                     x: number, y: number, width?: number, height?: number): void {
         if (image instanceof Canvas) {
             this.context.drawImage(image.getDomNode(), x * this.pixelRatio, y * this.pixelRatio,
                 (width != null) ? (width * this.pixelRatio) : (image.width * this.pixelRatio),
                 (height != null) ? (height * this.pixelRatio) : (image.height * this.pixelRatio));
         } else if (image instanceof HTMLImageElement) {
-            this.context.drawImage(<HTMLImageElement>image, x * this.pixelRatio, y * this.pixelRatio,
+            this.context.drawImage(image as HTMLImageElement, x * this.pixelRatio, y * this.pixelRatio,
                 (width != null) ? (width * this.pixelRatio) : (image.width * this.pixelRatio),
                 (height != null) ? (height * this.pixelRatio) : (image.height * this.pixelRatio));
         }
     }
 
     public drawScaledImage(image: HTMLImageElement | HTMLCanvasElement | ImageBitmap | ICanvas,
-                           x: number, y: number, width: number, height: number, srcX: number, srcY: number, srcWidth: number, srcHeight: number) {
+                           x: number, y: number, width: number, height: number,
+                           srcX: number, srcY: number, srcWidth: number, srcHeight: number): void {
         if (image instanceof Canvas) {
             this.context.drawImage(image.getDomNode(), srcX, srcY, srcWidth, srcHeight,
                 x * this.pixelRatio, y * this.pixelRatio, width * this.pixelRatio, height * this.pixelRatio);
         } else {
-            this.context.drawImage(<HTMLImageElement>image, srcX, srcY, srcWidth, srcHeight,
+            this.context.drawImage(image as HTMLImageElement, srcX, srcY, srcWidth, srcHeight,
                 x * this.pixelRatio, y * this.pixelRatio, width * this.pixelRatio, height * this.pixelRatio);
         }
     }
@@ -267,6 +274,7 @@ export class Canvas implements ICanvas {
         const gradient: CanvasGradient = this.context.createLinearGradient(x1 * this.pixelRatio,
             y1 * this.pixelRatio, x2 * this.pixelRatio, y2 * this.pixelRatio);
 
+        // tslint:disable-next-line: prefer-for-of
         for (let n = 0; n < colorSteps.length; n ++) {
             gradient.addColorStop(colorSteps[n].offset, colorSteps[n].color);
         }
@@ -281,6 +289,7 @@ export class Canvas implements ICanvas {
         const gradient: CanvasGradient = this.context.createRadialGradient(x1 * this.pixelRatio,
             y1 * this.pixelRatio, radiusX, x2 * this.pixelRatio, y2 * this.pixelRatio, radiusY);
 
+        // tslint:disable-next-line: prefer-for-of
         for (let n = 0; n < colorSteps.length; n ++) {
             gradient.addColorStop(colorSteps[n].offset, colorSteps[n].color);
         }
@@ -291,23 +300,25 @@ export class Canvas implements ICanvas {
     }
 
     public createPattern(image: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement | ICanvas,
-                         repetitionStyle: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat') {
-        let pattern: CanvasPattern = null;
+                         repetitionStyle: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat'): FillStyle {
+        let pattern: CanvasPattern | null = null;
         if (image instanceof Canvas) {
             pattern = this.context.createPattern(image.getDomNode(), repetitionStyle);
         } else {
-            pattern = this.context.createPattern(<HTMLImageElement>image, repetitionStyle);
+            pattern = this.context.createPattern(image as HTMLImageElement, repetitionStyle);
         }
 
         const fillStyle: FillStyle = new FillStyle();
-        fillStyle.value = pattern;
+        if (pattern) {
+            fillStyle.value = pattern;
+        }
         return fillStyle;
     }
 
     /**
      * Helper methods
      */
-    protected roundNumber(value: number, decimals: number) {
+    protected roundNumber(value: number, decimals: number): number {
         return Number(Number(value).toFixed(decimals));
     }
 }

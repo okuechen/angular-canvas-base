@@ -12,7 +12,7 @@ export class Point {
         }
     }
 
-    public setPoint(x: number, y: number) {
+    public setPoint(x: number, y: number): void {
         this.x = x;
         this.y = y;
     }

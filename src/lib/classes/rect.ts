@@ -22,12 +22,12 @@ export class Rect {
         }
     }
 
-    public setPosition(x: number, y: number) {
+    public setPosition(x: number, y: number): void {
         this.x = x;
         this.y = y;
     }
 
-    public setRect(x: number, y: number, width: number, height: number) {
+    public setRect(x: number, y: number, width: number, height: number): void {
         this.x = x;
         this.y = y;
         this.width = width;
