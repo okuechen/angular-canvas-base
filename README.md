@@ -1,6 +1,6 @@
 # angular-canvas-base
 
-The react canvas base was created to simplify creating canvas components for angular. You can add it to your project via NPM.
+The angular canvas base was created to simplify creating canvas components for angular. You can add it to your project via NPM.
 
 `npm install angular-canvas-base`
 
