@@ -137,10 +137,15 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
 
     // Overridables
     protected eventResize(width: number, height: number): void {}
-    protected eventClick(event: PointerEvent): void {}
+
     protected eventDrag(event: PointerEvent): boolean { return false; }
     protected eventDragMove(event: PointerEvent): void {}
     protected eventDrop(event: PointerEvent, startPosition: Point): void {}
+
+    protected eventClick(event: PointerEvent): void {}
+    protected eventPointerMove(event: PointerEvent): void {}
+    protected eventPointerUp(event: PointerEvent): void {}
+    protected eventPointerDown(event: PointerEvent): void {}
 
     protected getTime(): number {
         return window.performance.now();
@@ -180,13 +185,14 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
         if (this.dragStartTimeoutHandle) {
             window.clearTimeout(this.dragStartTimeoutHandle);
             this.dragStartTimeoutHandle = null;
-            return;
         }
 
         if (this.dragging) {
             this.eventDrop(event, this.dragStartPosition);
             this.dragging = false;
         }
+
+        this.eventPointerUp(event);
     }
 
     private mouseMove(event: PointerEvent): void {
@@ -194,13 +200,14 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
             if (this.getDistance(this.dragStartPosition.x, this.dragStartPosition.y, event.offsetX, event.offsetY) > this.dragMaxDistance) {
                 window.clearTimeout(this.dragStartTimeoutHandle);
                 this.dragStartTimeoutHandle = null;
-                return;
             }
         }
 
         if (this.dragging) {
             this.eventDragMove(event);
         }
+
+        this.eventPointerMove(event);
     }
 
     private mouseDown(event: PointerEvent): void {
@@ -209,5 +216,7 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
             this.dragStartTimeoutHandle = null;
             this.dragging = this.eventDrag(event);
         }, this.dragStartTimeout);
+
+        this.eventPointerDown(event);
     }
 }
