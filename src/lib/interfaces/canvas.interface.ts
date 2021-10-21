@@ -39,6 +39,7 @@ export interface ICanvas {
     drawRoundRect(x: number, y: number, width: number, height: number,
                   radius: number | ICorners, fill: boolean, stroke: boolean): void;
     drawLine(x: number, y: number, x2: number, y2: number): void;
+    measureText(text: string): TextMetrics;
     drawText(text: string, x: number, y: number, maxWidth?: number, fill?: boolean, stroke?: boolean): void;
     drawWrappedText(text: string, x: number, y: number, maxWidth: number, lineHeight: number, fill?: boolean, stroke?: boolean): void;
     drawImage(image: HTMLImageElement | HTMLCanvasElement | ImageBitmap,

@@ -198,6 +198,10 @@ export class Canvas implements ICanvas {
         this.context.stroke();
     }
 
+    public measureText(text: string): TextMetrics {
+        return this.context.measureText(text);
+    }
+
     public drawText(text: string, x: number, y: number, maxWidth?: number, fill?: boolean, stroke?: boolean): void {
         if (fill !== false) {
             if (maxWidth == null) {
