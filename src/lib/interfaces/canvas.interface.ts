@@ -12,7 +12,16 @@ export interface ICorners {
     bottomleft: number;
 }
 
+export type TextBaseline = 'alphabetic' | 'top' | 'hanging' | 'middle' | 'ideographic' | 'bottom';
+
 export interface ICanvas {
+    getCurrentFilter(): Readonly<CanvasFilter> | undefined;
+    getCurrentStrokeStyle(): Readonly<StrokeStyle> | undefined;
+    getCurrentFillStyle(): Readonly<FillStyle> | undefined;
+    getCurrentShadowStyle(): Readonly<ShadowStyle> | undefined;
+    getCurrentFont(): Readonly<CanvasFont> | undefined;
+    getCurrentTextBaseline(): TextBaseline | undefined;
+    getCurrentOpacity(): number | undefined;
     getDomNode(): HTMLCanvasElement;
     getWidth(): number;
     getHeight(): number;
@@ -30,7 +39,7 @@ export interface ICanvas {
     setStrokeStyle(style: StrokeStyle): void;
     setShadowStyle(style: ShadowStyle): void;
     setFont(font: CanvasFont): void;
-    setTextBaseline(alignment: 'alphabetic' | 'top' | 'hanging' | 'middle' | 'ideographic' | 'bottom'): void;
+    setTextBaseline(alignment: TextBaseline): void;
     setOpacity(value: number): void;
     setClipRegion(x: number, y: number, width: number, height: number): void;
     drawRect(x: number, y: number, width: number, height: number, fill?: boolean, stroke?: boolean): void;

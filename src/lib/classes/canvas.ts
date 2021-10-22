@@ -1,5 +1,5 @@
 import { CanvasPath } from './canvas-path';
-import { ICanvas, ICorners } from '../interfaces/canvas.interface';
+import { ICanvas, ICorners, TextBaseline } from '../interfaces/canvas.interface';
 import { FillStyle, IColorStep } from './fill-style';
 import { StrokeStyle } from './stroke-style';
 import { ICanvasPath } from '../interfaces/canvas-path.interface';
@@ -16,12 +16,49 @@ export class Canvas implements ICanvas {
     private width = 0;
     private height = 0;
 
+    // We buffer some values so we don't have to access the canvas for them
+    private currentFilter?: CanvasFilter;
+    private currentStrokeStyle?: StrokeStyle;
+    private currentFillStyle?: FillStyle;
+    private currentShadowStyle?: ShadowStyle;
+    private currentFont?: CanvasFont;
+    private currentTextBaseline?: TextBaseline;
+    private currentOpacity?: number;
+
     constructor() {
         this.pixelRatio = window.devicePixelRatio || 1;
 
         this.canvasNode = document.createElement('canvas');
         this.context = this.canvasNode.getContext('2d') as CanvasRenderingContext2D;
         this.canvasPath = new CanvasPath(this.context, this.pixelRatio);
+    }
+
+    public getCurrentFilter(): Readonly<CanvasFilter> | undefined {
+        return this.currentFilter;
+    }
+
+    public getCurrentStrokeStyle(): Readonly<StrokeStyle> | undefined {
+        return this.currentStrokeStyle;
+    }
+
+    public getCurrentFillStyle(): Readonly<FillStyle> | undefined {
+        return this.currentFillStyle;
+    }
+
+    public getCurrentShadowStyle(): Readonly<ShadowStyle> | undefined {
+        return this.currentShadowStyle;
+    }
+
+    public getCurrentFont(): Readonly<CanvasFont> | undefined {
+        return this.currentFont;
+    }
+
+    public getCurrentTextBaseline(): TextBaseline | undefined {
+        return this.currentTextBaseline;
+    }
+
+    public getCurrentOpacity(): number | undefined {
+        return this.currentOpacity;
     }
 
     public toBase64(): string {
@@ -86,6 +123,7 @@ export class Canvas implements ICanvas {
     }
 
     public setFilter(filter: CanvasFilter): void {
+        this.currentFilter = filter;
         this.context.filter = filter.getFilter();
     }
 
@@ -98,12 +136,16 @@ export class Canvas implements ICanvas {
     }
 
     public setFillStyle(style: FillStyle): void {
+        this.currentFillStyle = style;
+
         if (style.value) {
             this.context.fillStyle = style.value;
         }
     }
 
     public setStrokeStyle(style: StrokeStyle): void {
+        this.currentStrokeStyle = style;
+
         if (style.color) {
             this.context.strokeStyle = style.color;
         }
@@ -116,24 +158,33 @@ export class Canvas implements ICanvas {
             this.context.shadowBlur = style.blur;
             this.context.shadowOffsetX = style.offsetX * this.pixelRatio;
             this.context.shadowOffsetY = style.offsetY * this.pixelRatio;
+            this.currentShadowStyle = style;
         } else {
             this.context.shadowColor = 'rgba(0, 0, 0, 0)';
             this.context.shadowBlur = 0;
             this.context.shadowOffsetX = 0;
             this.context.shadowOffsetY = 0;
+            this.currentShadowStyle = undefined;
         }
     }
 
     public setFont(font: CanvasFont): void {
+        this.currentFont = font;
         this.context.font = `${font.fontStyle} ${font.fontWeight} ${font.fontSize * this.pixelRatio}px ${font.fontFamily}`;
     }
 
-    public setTextBaseline(alignment: 'alphabetic' | 'top' | 'hanging' | 'middle' | 'ideographic' | 'bottom'): void {
-        this.context.textBaseline = alignment;
+    public setTextBaseline(alignment: TextBaseline): void {
+        if (this.currentTextBaseline !== alignment) {
+            this.currentTextBaseline = alignment;
+            this.context.textBaseline = alignment;
+        }
     }
 
     public setOpacity(value: number): void {
-        this.context.globalAlpha = value;
+        if (this.currentOpacity !== value) {
+            this.currentOpacity = value;
+            this.context.globalAlpha = value;
+        }
     }
 
     public setClipRegion(x: number, y: number, width: number, height: number): void {

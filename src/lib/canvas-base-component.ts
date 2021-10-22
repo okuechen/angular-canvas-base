@@ -1,4 +1,4 @@
-import { OnDestroy, Renderer2, AfterViewInit, ElementRef, Injector, Directive } from '@angular/core';
+import { OnDestroy, Renderer2, AfterViewInit, ElementRef, Injector, Directive, HostListener, Input } from '@angular/core';
 
 import { CanvasDrawMode } from './enums/canvas-draw-mode.enum';
 import { Canvas } from './classes/canvas';
@@ -7,6 +7,9 @@ import { Point } from './classes/point';
 
 @Directive()
 export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
+
+    @Input() eventElement: HTMLElement | null = null;
+
     protected height = 0;
     protected width = 0;
     protected drawMode: CanvasDrawMode = CanvasDrawMode.OnDemand;
@@ -39,8 +42,20 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
     public ngAfterViewInit(): void {
         this.attachCanvas(this.elementRef.nativeElement);
 
-        this.renderer.listen(this.getCanvasNode(), 'click', (event) => {
+        this.renderer.listen(this.eventElement ?? this.getCanvasNode(), 'click', (event) => {
             this.eventClick(event);
+        });
+
+        this.renderer.listen(this.eventElement ?? this.getCanvasNode(), 'mouseup', (event) => {
+            this.mouseUp(event);
+        });
+
+        this.renderer.listen(this.eventElement ?? this.getCanvasNode(), 'mousedown', (event) => {
+            this.mouseDown(event);
+        });
+
+        this.renderer.listen(this.eventElement ?? this.getCanvasNode(), 'mousemove', (event) => {
+            this.mouseMove(event);
         });
     }
 
@@ -117,20 +132,6 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
 
     public enableDragAndDrop(enable: boolean): void {
         this.dragAndDropEnabled = enable;
-
-        if (enable) {
-            this.renderer.listen(this.getCanvasNode(), 'mouseup', (event) => {
-                this.mouseUp(event);
-            });
-
-            this.renderer.listen(this.getCanvasNode(), 'mousedown', (event) => {
-                this.mouseDown(event);
-            });
-
-            this.renderer.listen(this.getCanvasNode(), 'mousemove', (event) => {
-                this.mouseMove(event);
-            });
-        }
     }
 
     protected abstract onDraw(canvas: ICanvas, deltaTime?: number): void;
@@ -182,40 +183,47 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
     }
 
     private mouseUp(event: PointerEvent): void {
-        if (this.dragStartTimeoutHandle) {
-            window.clearTimeout(this.dragStartTimeoutHandle);
-            this.dragStartTimeoutHandle = null;
-        }
+        if (this.dragAndDropEnabled) {
+            if (this.dragStartTimeoutHandle) {
+                window.clearTimeout(this.dragStartTimeoutHandle);
+                this.dragStartTimeoutHandle = null;
+            }
 
-        if (this.dragging) {
-            this.eventDrop(event, this.dragStartPosition);
-            this.dragging = false;
+            if (this.dragging) {
+                this.eventDrop(event, this.dragStartPosition);
+                this.dragging = false;
+            }
         }
 
         this.eventPointerUp(event);
     }
 
     private mouseMove(event: PointerEvent): void {
-        if (this.dragStartTimeoutHandle) {
-            if (this.getDistance(this.dragStartPosition.x, this.dragStartPosition.y, event.offsetX, event.offsetY) > this.dragMaxDistance) {
-                window.clearTimeout(this.dragStartTimeoutHandle);
-                this.dragStartTimeoutHandle = null;
+        if (this.dragAndDropEnabled) {
+            if (this.dragStartTimeoutHandle) {
+                if (this.getDistance(this.dragStartPosition.x, this.dragStartPosition.y,
+                        event.offsetX, event.offsetY) > this.dragMaxDistance) {
+                    window.clearTimeout(this.dragStartTimeoutHandle);
+                    this.dragStartTimeoutHandle = null;
+                }
             }
-        }
 
-        if (this.dragging) {
-            this.eventDragMove(event);
+            if (this.dragging) {
+                this.eventDragMove(event);
+            }
         }
 
         this.eventPointerMove(event);
     }
 
     private mouseDown(event: PointerEvent): void {
-        this.dragStartPosition.setPoint(event.offsetX, event.offsetY);
-        this.dragStartTimeoutHandle = window.setTimeout(() => {
-            this.dragStartTimeoutHandle = null;
-            this.dragging = this.eventDrag(event);
-        }, this.dragStartTimeout);
+        if (this.dragAndDropEnabled) {
+            this.dragStartPosition.setPoint(event.offsetX, event.offsetY);
+            this.dragStartTimeoutHandle = window.setTimeout(() => {
+                this.dragStartTimeoutHandle = null;
+                this.dragging = this.eventDrag(event);
+            }, this.dragStartTimeout);
+        }
 
         this.eventPointerDown(event);
     }
