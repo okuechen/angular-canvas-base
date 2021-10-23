@@ -57,6 +57,10 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
         this.renderer.listen(this.eventElement ?? this.getCanvasNode(), 'mousemove', (event) => {
             this.mouseMove(event);
         });
+
+        this.renderer.listen(this.eventElement ?? this.getCanvasNode(), 'mouseleave', (event) => {
+            this.mouseLeave(event);
+        });
     }
 
     public ngOnDestroy(): void {
@@ -147,6 +151,7 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
     protected eventPointerMove(event: PointerEvent): void {}
     protected eventPointerUp(event: PointerEvent): void {}
     protected eventPointerDown(event: PointerEvent): void {}
+    protected eventPointerLeave(event: PointerEvent): void {}
 
     protected getTime(): number {
         return window.performance.now();
@@ -226,5 +231,9 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
         }
 
         this.eventPointerDown(event);
+    }
+
+    private mouseLeave(event: PointerEvent): void {
+        this.eventPointerLeave(event);
     }
 }

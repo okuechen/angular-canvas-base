@@ -14,7 +14,10 @@
   "keywords": [
       "angular",
       "canvas",
-      "custom component"
+      "custom component",
+      "base",
+      "directive",
+      "owner draw"
   ],
   "repository": {
       "type": "git",
