@@ -93,6 +93,9 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
         this.width = width;
         this.height = height;
 
+        this.renderer.setStyle(this.canvas.getDomNode(), 'width', `${ width }px`);
+        this.renderer.setStyle(this.canvas.getDomNode(), 'height', `${ height }px`);
+
         this.canvas.resizeCanvas(width, height);
 
         this.eventResize(width, height);
