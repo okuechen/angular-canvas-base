@@ -1,3 +1,6 @@
+/**
+ * A rectangle with x and y as start points inside the canvas, and width / height to define the size.
+ */
 export class Rect {
     public x = 0;
     public y = 0;
@@ -22,11 +25,17 @@ export class Rect {
         }
     }
 
+    /**
+     * Set the position of the rectangle in pixel.
+     */
     public setPosition(x: number, y: number): void {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Set the entire rect.
+     */
     public setRect(x: number, y: number, width: number, height: number): void {
         this.x = x;
         this.y = y;
@@ -34,6 +43,9 @@ export class Rect {
         this.height = height;
     }
 
+    /**
+     * Check if a coordinate is inside the rectangle.
+     */
     public pointInRect(x: number, y: number): boolean {
         if (x >= this.x && x <= this.x + this.width &&
             y >= this.y && y <= this.y + this.height) {

@@ -1,3 +1,6 @@
+/**
+ * Representing a font that can be set in an ICanvas to render text. Values are similar to css.
+ */
 export class CanvasFont {
     public fontStyle: 'normal' | 'italic' = 'normal';
     public fontWeight: number | 'normal' | 'bold' | 'bolder' | 'lighter' = 'normal';

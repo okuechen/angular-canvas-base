@@ -5,10 +5,19 @@ import { Canvas } from './classes/canvas';
 import { ICanvas } from './interfaces/canvas.interface';
 import { Point } from './classes/point';
 
+/**
+ * The base directive that is used to extend canvas components.
+ */
 @Directive()
 export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
 
+    /**
+     * If a different element should handle the inputs, put it into eventElement.
+     */
     @Input() eventElement: HTMLElement | null = null;
+
+    protected elementRef: ElementRef;
+    protected renderer: Renderer2;
 
     protected height = 0;
     protected width = 0;
@@ -26,10 +35,7 @@ export abstract class CanvasBaseDirective implements OnDestroy, AfterViewInit {
     private currentFrameRequestID: number | null = null;
     private lastTime = 0;
     private disposed = false;
-
     private canvas: Canvas;
-    protected elementRef: ElementRef;
-    protected renderer: Renderer2;
 
     constructor(protected injector: Injector) {
         this.elementRef = injector.get(ElementRef);

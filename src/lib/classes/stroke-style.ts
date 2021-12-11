@@ -1,3 +1,6 @@
+/**
+ * Defines the current stroke style of the canvas. Set color and linewidth for stroke actions.
+ */
 export class StrokeStyle {
     public color: string | CanvasGradient | undefined;
     public lineWidth: number | undefined;

@@ -1,33 +1,39 @@
 {
-  "name": "angular-canvas-base",
-  "author": "Oliver Küchen",
-  "license": "MIT",
-  "bugs": {
-      "url": "https://github.com/okuechen/angular-canvas-base/issues"
-  },
-  "homepage": "https://github.com/okuechen/angular-canvas-base",
-  "version": "0.1.2",
-  "private": false,
-  "typings": "./dist/index.d.ts",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "keywords": [
-      "angular",
-      "canvas",
-      "custom component",
-      "base",
-      "directive",
-      "owner draw"
-  ],
-  "repository": {
-      "type": "git",
-      "url": "https://github.com/okuechen/angular-canvas-base.git"
-  },
-  "peerDependencies": {
-    "@angular/common": "~11.0.9",
-    "@angular/core": "~11.0.9"
-  },
-  "dependencies": {
-    "tslib": "^2.0.0"
-  }
+    "name": "angular-canvas-base",
+    "author": "Oliver Küchen",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/okuechen/angular-canvas-base/issues"
+    },
+    "homepage": "https://github.com/okuechen/angular-canvas-base",
+    "version": "0.1.2",
+    "private": false,
+    "typings": "./dist/index.d.ts",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "keywords": [
+        "angular",
+        "canvas",
+        "custom component",
+        "base",
+        "directive",
+        "owner draw"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/okuechen/angular-canvas-base.git"
+    },
+    "scripts": {
+        "typedoc": "typedoc ./src/public-api.ts --tsconfig tsconfig.lib.json"
+    },
+    "peerDependencies": {
+        "@angular/common": "~11.0.9",
+        "@angular/core": "~11.0.9"
+    },
+    "dependencies": {
+        "tslib": "^2.0.0"
+    },
+    "devDependencies": {
+        "typedoc": "^0.22.6"
+    }
 }

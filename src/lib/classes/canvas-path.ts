@@ -11,6 +11,9 @@ export class CanvasPath implements ICanvasPath {
         return this.pathOpen;
     }
 
+    /**
+     * Begin a new path. Only available if there is no path open yet.
+     */
     public begin(): void {
         if (this.pathOpen) {
             return;
