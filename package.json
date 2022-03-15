@@ -6,7 +6,7 @@
         "url": "https://github.com/okuechen/angular-canvas-base/issues"
     },
     "homepage": "https://github.com/okuechen/angular-canvas-base",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "private": false,
     "typings": "./dist/index.d.ts",
     "main": "dist/index.js",
@@ -27,8 +27,8 @@
         "typedoc": "typedoc ./src/public-api.ts --tsconfig tsconfig.lib.json"
     },
     "peerDependencies": {
-        "@angular/common": "^11.0.9",
-        "@angular/core": "^11.0.9"
+        "@angular/common": "^13.2.6",
+        "@angular/core": "^13.2.6"
     },
     "dependencies": {
         "tslib": "^2.0.0"
